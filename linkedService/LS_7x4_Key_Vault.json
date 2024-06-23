@@ -1,0 +1,11 @@
+{
+	"name": "LS_7x4_Key_Vault",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://a7x4-key-vault.vault.azure.net/"
+		}
+	}
+}

@@ -1,0 +1,23 @@
+{
+	"name": "LS_E_Layer_Blog",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://elayerairindia.blob.core.windows.net/",
+			"tenant": "46ad7d19-6e20-482f-9350-9ded1a09f838",
+			"servicePrincipalId": "a61ca8e8-f7a8-4f73-b61f-0ba2ba397421",
+			"servicePrincipalCredentialType": "ServicePrincipalKey",
+			"servicePrincipalCredential": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_7x4_Key_Vault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "service-principle-client-secret"
+			},
+			"accountKind": "StorageV2"
+		}
+	}
+}

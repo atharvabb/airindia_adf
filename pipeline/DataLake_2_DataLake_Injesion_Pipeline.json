@@ -1,0 +1,245 @@
+{
+	"name": "DataLake_2_DataLake_Injesion_Pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup1').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@not(equals(split(item().Src_File_Name,'.')[1],'zip'))\n",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "Copy data1_copy2",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "BinarySource",
+												"storeSettings": {
+													"type": "AzureBlobFSReadSettings",
+													"recursive": true
+												},
+												"formatSettings": {
+													"type": "BinaryReadSettings",
+													"compressionProperties": {
+														"type": "ZipDeflateReadSettings",
+														"preserveZipFileNameAsFolder": false
+													}
+												}
+											},
+											"sink": {
+												"type": "BinarySink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings"
+												}
+											},
+											"enableStaging": false
+										},
+										"inputs": [
+											{
+												"referenceName": "DS_SOURCE_BINARY",
+												"type": "DatasetReference",
+												"parameters": {
+													"filename": {
+														"value": "@item().Src_File_Name",
+														"type": "Expression"
+													},
+													"container": "@item().Src_File_Container"
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DS_SOURCE_BINARY_copy1",
+												"type": "DatasetReference",
+												"parameters": {
+													"filename": {
+														"value": "@item().Src_File_Name",
+														"type": "Expression"
+													},
+													"container": "@item().Dump_Layer",
+													"dir": "@concat(item().Sink_File_Dir,'/','dw_load_date=',formatDateTime(utcNow(),'yyyy-MM-dd'))"
+												}
+											}
+										]
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "Copy data1_copy1",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"storeSettings": {
+													"type": "AzureBlobFSReadSettings",
+													"recursive": true,
+													"enablePartitionDiscovery": false
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings"
+												}
+											},
+											"sink": {
+												"type": "DelimitedTextSink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings"
+												},
+												"formatSettings": {
+													"type": "DelimitedTextWriteSettings",
+													"quoteAllText": true,
+													"fileExtension": ".txt"
+												}
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "DS_E_Layer_Data_Lake_Csv",
+												"type": "DatasetReference",
+												"parameters": {
+													"Container": {
+														"value": "@item().Src_File_Container",
+														"type": "Expression"
+													},
+													"Directory": ".",
+													"FileName": {
+														"value": "@item().Src_File_Name",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DS_7X4_Data_Lake_Csv",
+												"type": "DatasetReference",
+												"parameters": {
+													"Container": {
+														"value": "@item().Dump_Layer",
+														"type": "Expression"
+													},
+													"FileName": {
+														"value": "@item().Src_File_Name",
+														"type": "Expression"
+													},
+													"Directory": {
+														"value": "@concat(item().Sink_File_Dir,'/','dw_load_date=',formatDateTime(utcNow(),'yyyy-MM-dd'))",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "Json1",
+						"type": "DatasetReference",
+						"parameters": {
+							"filename": {
+								"value": "@pipeline().parameters.Lookup_File",
+								"type": "Expression"
+							},
+							"container": {
+								"value": "@pipeline().parameters.Lookup_Container",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"parameters": {
+			"Lookup_Container": {
+				"type": "string",
+				"defaultValue": "reference-files"
+			},
+			"Lookup_File": {
+				"type": "string",
+				"defaultValue": "datalake_lkp.json"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-06-22T18:03:48Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
