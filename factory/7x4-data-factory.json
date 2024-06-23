@@ -2,14 +2,8 @@
 	"name": "7x4-data-factory",
 	"location": "eastus",
 	"identity": {
-		"type": "SystemAssigned,UserAssigned",
-		"principalId": "e734260a-f3d3-42fc-aa7e-e1de18abbfdf",
-		"tenantId": "46ad7d19-6e20-482f-9350-9ded1a09f838",
-		"userAssignedIdentities": {
-			"/subscriptions/4f5a8d72-b9ef-4c2f-96a6-a7b192805eaf/resourcegroups/air_india_dev_rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/Fin_Load_Dev_Managed_User": {
-				"clientId": "b99352cb-f27a-4220-bda8-d49c0fc6c56c",
-				"principalId": "50fa7dca-2517-444d-8528-35c00ebbd72d"
-			}
-		}
+		"type": "SystemAssigned",
+		"principalId": "1bf1b5fa-dca9-45d7-9ded-a50435e1f848",
+		"tenantId": "46ad7d19-6e20-482f-9350-9ded1a09f838"
 	}
 }
